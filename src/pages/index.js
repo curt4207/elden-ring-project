@@ -1,7 +1,5 @@
 import Head from "next/head";
 import { Card } from "@mui/material";
-import { GetAllBossesData } from "./api/GetAllBossesData";
-import { GetAllClassesData } from "./api/GetAllClassesData";
 import Link from "next/link";
 
 // const armorsLimit = "armors?limit=100";
