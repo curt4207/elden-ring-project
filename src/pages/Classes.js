@@ -14,7 +14,8 @@ import styled, { keyframes } from "styled-components";
 import styles from "../styles/styles.module.css";
 
 // import Framer Motion
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+
 // MUI imports
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -37,20 +38,28 @@ import IconButton from "@mui/material/IconButton";
 function ClassesList() {
   const [classes, setClasses] = useState([]);
 
-  // Styled
-  const ClassCardContainer = styled.div`
-    border: 1px solid black;
-    width: 286px;
-    height: 500px;
-    cursor: grab;
+  const CardWrapper = styled(motion.div)`
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+    perspective: 2000;
+    justify-content: center;
+  `;
+
+  // Styled
+  const ClassCardContainer = styled(motion.div)`
+    border: 1px solid black;
+    min-width: 300px;
+    width: 306px;
+    height: 540px;
+    cursor: grab;
+    ${"" /* display: flex; */}
+    ${"" /* flex-direction: column; */}
     font-size: 18px;
     position: relative;
-    ${"" /* background-color: #33363a; */}
-    background-color: #4d5156;
+    background-color: #33363a;
     box-shadow: 0 2px 7px 1px rgba(31, 31, 31, 0.6);
-    color: whitesmoke;
+    color: white;
     border-radius: 25px;
     margin: 26px;
   `;
@@ -135,69 +144,118 @@ function ClassesList() {
     animation: 1s ${glow} ease-in-out infinite alternate;
   `;
 
+  const BottomWrapper = styled.div`
+    position: relative;
+    top: 190px;
+    z-index: 100;
+    display: flex;
+    color: white;
+  `;
+
+  const ImageWrapper = styled(motion.div)``;
   // use effect gets the data for classes for the getAllData api call, then sets classes to the data object data
   useEffect(() => {
     getAllData("https://eldenring.fanapis.com/api/classes").then((data) => {
       // console.log("classes data.data",data)
-      if (data === data) {
+      try {
         setClasses(data.data);
+      } catch {
+        console.log("Error");
       }
     });
   }, [setClasses]);
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateY = useTransform(y, [-100, 100], [30, -30]);
+  const rotateX = useTransform(x, [-100, 100], [-30, 30]);
 
   return (
     <>
       {/* <Layout /> */}
       <Layout>
         <h1 key="champion">Champion</h1>
-        <div
-          style={{
-            display: "flex",
-            flexFlow: "wrap",
-            backgroundColor: "whitesmoke",
-            justifyContent: "center",
-          }}
-        >
-          {classes.map((champion) => {
-            console.log("champion", champion);
-            return (
-              <>
-                <ClassCardContainer>
-                  <BackWrapper>
-                    <CircleCenterWrapper1>
-                      <CircleTopWrapper2>
-                        <CircleRightWrapper3>
-                          <CircleLeftWrapper4>
-                            <LineWrapper>
-                              <CardMedia
-                                component="img"
-                                sx={{
-                                  position: "relative",
-                                  top: "085px",
-                                  right: "6em",
-                                  minHeight: "320px",
-                                  maxHeight: "350px",
-                                  minWidth: "227px",
-                                  maxWidth: "200px",
-                                }}
-                                image={!champion.image ? "" : champion.image}
-                              />
-                            </LineWrapper>
-                          </CircleLeftWrapper4>
-                        </CircleRightWrapper3>
-                      </CircleTopWrapper2>
-                    </CircleCenterWrapper1>
-                    <CardContent
-                    sx={{
-                      marginBottom: 0,
+        <>
+          <CardWrapper>
+            {classes.map((champion) => {
+              console.log("champion", champion);
+              return (
+                <>
+                  <ClassCardContainer
+                    id="container"
+                    style={{ x, y, rotateX, rotateY, z: 50 }}
+                    drag
+                    dragElastic={0.07}
+                    dragConstraints={{
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      left: 0,
                     }}
-                    >{champion.description}</CardContent>
-                  </BackWrapper>
-                </ClassCardContainer>
-              </>
-            );
-          })}
-        </div>
+                  >
+                    <BackWrapper>
+                      <CircleCenterWrapper1>
+                        <CircleTopWrapper2>
+                          <CircleRightWrapper3>
+                            <CircleLeftWrapper4>
+                              <LineWrapper id="lineWrapper">
+                                <ImageWrapper
+                                  style={{ x, y, rotateX, rotateY, z: 50 }}
+                                  drag
+                                  dragElastic={0.07}
+                                  dragConstraints={{
+                                    top: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                  }}
+                                >
+                                  <CardMedia
+                                    component="img"
+                                    variant="rounded"
+                                    sx={{
+                                      position: "relative",
+                                      top: "35px",
+                                      right: "5em",
+                                      minHeight: "220px",
+                                      maxHeight: "350px",
+                                      minWidth: "227px",
+                                      maxWidth: "200px",
+                                      // userSelect: "none",
+                                    }}
+                                    image={
+                                      !champion.image ? "" : champion.image
+                                    }
+                                  />
+                                </ImageWrapper>
+                              </LineWrapper>
+                            </CircleLeftWrapper4>
+                          </CircleRightWrapper3>
+                        </CircleTopWrapper2>
+                      </CircleCenterWrapper1>
+
+                      <BottomWrapper>
+                        <CardContent
+                          sx={
+                            {
+                              // position: "relative",
+                              // top: "180px",
+                              // zIndex: 100,
+                              // display: "flex",
+                            }
+                          }
+                        >
+                          {champion.description}
+                        </CardContent>
+                      </BottomWrapper>
+                    </BackWrapper>
+                  </ClassCardContainer>
+                </>
+              );
+            })}
+          </CardWrapper>
+        </>
       </Layout>
     </>
   );

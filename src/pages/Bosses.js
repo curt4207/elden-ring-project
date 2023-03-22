@@ -89,10 +89,8 @@ function BossesList() {
   useEffect(() => {
     getAllData("https://eldenring.fanapis.com/api/bosses?limit=100").then(
       (data) => {
-        if(data === data) {
+        
           setBosses(data.data);
-
-        }
       }
     );
   }, []);
